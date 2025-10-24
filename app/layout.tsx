@@ -7,6 +7,7 @@ import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactNode } from "react";
+import AuthProvider from "@/components/AuthProvider/AuthProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -49,13 +50,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.variable}>
         <TanStackProvider>
-          <Header />
+          <AuthProvider>
+            <Header />
 
-          {children}
-          {modal}
+            {children}
+            {modal}
 
-          <Footer />
-          <ReactQueryDevtools initialIsOpen={false} />
+            <Footer />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>
