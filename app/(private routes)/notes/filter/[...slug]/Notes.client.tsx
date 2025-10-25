@@ -10,20 +10,24 @@ import { useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { useDebouncedCallback } from "use-debounce";
 import css from "./NotesPage.module.css";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
 interface NotesClientProps {
   category?: string;
 }
 
 export default function NotesClient({ category }: NotesClientProps) {
+  const params = useParams();
+
+  const activeCategory = category ?? (params?.category as string | undefined);
+
   const [topic, setTopic] = useState("");
   const [page, setPage] = useState(1);
 
-  const router = useRouter();
   const { data, isError, isSuccess } = useQuery({
-    queryKey: ["notes", topic, page, category],
-    queryFn: () => fetchNotes(topic, page, category),
+    queryKey: ["notes", topic, page, activeCategory],
+    queryFn: () => fetchNotes(topic, page, activeCategory),
     placeholderData: keepPreviousData,
     refetchOnMount: false,
   });
@@ -46,22 +50,18 @@ export default function NotesClient({ category }: NotesClientProps) {
             updatePage={setPage}
           />
         )}
-        <button
-          className={css.button}
-          onClick={() => router.push("/notes/action/create")}
-        >
+        <Link href="/notes/action/create" className={css.button}>
           Create note +
-        </button>
+        </Link>
       </header>
+
       {isError && (
         <ErrorMessage errorText="There was an error, please try again..." />
       )}
-      {data !== undefined && data?.notes.length === 0 && (
+      {data && data.notes.length === 0 && (
         <ErrorMessage errorText="No notes found" />
       )}
-      {data !== undefined && data?.notes.length > 0 && (
-        <NoteList notes={data?.notes} />
-      )}
+      {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
       <Toaster />
     </div>
   );
